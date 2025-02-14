@@ -37,9 +37,28 @@ This repo contains the solution code for the [Python FastAPI SQLAlchemy Relation
 createdb teas_db
 ```
 
-2. Seed the database with initial data:
+### Connect to database
 
-   - Run the `seed.py` file to reset the database by dropping existing tables and repopulating it with starter data:
+Open the application in Visual Studio Code:
+
+```bash
+code .
+```
+
+The database connection string is defined in the `config/environment.py` file:
+
+```python
+db_URI = "postgresql://<username>@localhost:5432/teas_db"
+```
+
+- Ensure your PostgreSQL instance is configured to allow connections with the provided credentials.
+- **_Modify your database connection string to use your username as the `<username>`._**
+
+### Seed the database
+
+Seed the database with initial data:
+
+- Run the `seed.py` file to reset the database by dropping existing tables and repopulating it with starter data:
 
 ```bash
 pipenv run python seed.py
@@ -47,73 +66,52 @@ pipenv run python seed.py
 
 > You should see output indicating the database was successfully seeded. If there are any errors, check the `db_URI` in the `config/environment.py` file.
 
-3. Start the development server:
+### Verifying the Data
 
-```bash
-pipenv run uvicorn main:app --reload
-```
-
-> You should now have the app running. Visit [`http://127.0.0.1:8000`](http://127.0.0.1:8000) in your browser to confirm it’s working.
-
-4. Open the application in Visual Studio Code:
-
-```bash
-code .
-```
-
-### Notes on Configuration
-
-- The database connection string is defined in the `config/environment.py` file:
-
-  ```python
-  db_URI = "postgresql://<username>@localhost:5432/teas_db"
-  ```
-
-- Ensure your PostgreSQL instance is configured to allow connections with the provided credentials.
-- **_Modify your database connection string to use your username as the `<username>`._**
-
-### Setting Up a User in PostgreSQL
-
-To connect to a specific PostgreSQL user, use the following command:
+To confirm that the data has been inserted correctly, use the `psql` tool to query the database.
 
 ```sh
-psql -U <username>
+psql -d teas_db -U <username>
 ```
 
-#### Handling "Role Does Not Exist" Error
-
-If you see this error:
-
-```sh
-Error: FATAL: role "<username>" does not exist
-```
-
-it means that the specified user does not exist in PostgreSQL.
-
-#### Creating a New PostgreSQL User
-
-To create the user, run the following command inside `psql`:
+### Query the Tables
 
 ```sql
-CREATE ROLE "<username>" WITH LOGIN PASSWORD 'your_secure_password';
+-- View all teas
+SELECT * FROM teas;
+
+-- View all comments
+SELECT * FROM comments;
 ```
 
-> 🔹 **Replace** `<username>` with your desired username and **choose a secure password**.
+You should see the following results:
 
-This will allow you to connect using one of the following database connection strings:
+1. The `teas` table contains the teas from `teas_list`.
 
-#### Connection Strings:
-
-If **no password is required**:
-
-```python
-db_URI = "postgresql://<username>@localhost:5432/teas_db"
+```text
+ id |    name    | in_stock | rating |         created_at         |         updated_at
+----+------------+----------+--------+----------------------------+----------------------------
+  1 | chai       | t        |      4 | 2025-02-14 14:45:55.261833 | 2025-02-14 14:45:55.261833
+  2 | earl grey  | f        |      3 | 2025-02-14 14:45:55.261833 | 2025-02-14 14:45:55.261833
+  3 | matcha     | t        |      3 | 2025-02-14 14:45:55.261833 | 2025-02-14 14:45:55.261833
+  4 | green tea  | t        |      5 | 2025-02-14 14:45:55.261833 | 2025-02-14 14:45:55.261833
+  5 | black tea  | t        |      4 | 2025-02-14 14:45:55.261833 | 2025-02-14 14:45:55.261833
+  6 | oolong     | f        |      4 | 2025-02-14 14:45:55.261833 | 2025-02-14 14:45:55.261833
+  7 | hibiscus   | t        |      4 | 2025-02-14 14:45:55.261833 | 2025-02-14 14:45:55.261833
+  8 | peppermint | t        |      5 | 2025-02-14 14:45:55.261833 | 2025-02-14 14:45:55.261833
+  9 | jasmine    | t        |      3 | 2025-02-14 14:45:55.261833 | 2025-02-14 14:45:55.261833
+(9 rows)
 ```
 
-If **a password is required**:
+2. The `comments` table contains the comments from `comments_list`, with the correct `tea_id` linking them to their respective teas.
 
-```python
-db_URI = "postgresql://<username>:<your_secure_password>@localhost:5432/teas_db"
+```text
+ id |               content                | tea_id |         created_at         |         updated_at
+----+--------------------------------------+--------+----------------------------+----------------------------
+  1 | This is a great tea                  |      1 | 2025-02-14 14:45:55.264234 | 2025-02-14 14:45:55.264234
+  2 | Perfect for relaxing evenings        |      2 | 2025-02-14 14:45:55.264234 | 2025-02-14 14:45:55.264234
+  3 | I love the vibrant green color!      |      3 | 2025-02-14 14:45:55.264234 | 2025-02-14 14:45:55.264234
+  4 | So refreshing and healthy!           |      4 | 2025-02-14 14:45:55.264234 | 2025-02-14 14:45:55.264234
+  5 | A classic choice for any time of day |      5 | 2025-02-14 14:45:55.264234 | 2025-02-14 14:45:55.264234
+(5 rows)
 ```
-
-This ensures that PostgreSQL correctly authenticates and allows access to the `teas_db` database.

@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from data.tea_data import teas_list, comments_list
 from config.environment import db_URI
 from sqlalchemy import create_engine
+from models.base import Base
 
 engine = create_engine(db_URI)
 SessionLocal = sessionmaker(bind=engine)
