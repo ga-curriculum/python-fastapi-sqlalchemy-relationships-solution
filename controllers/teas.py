@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from models.tea_data import teas_db
+from models.tea import TeaModel
 
 router = APIRouter()
 
